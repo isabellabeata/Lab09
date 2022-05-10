@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import it.polito.tdp.borders.model.Border;
 import it.polito.tdp.borders.model.Country;
@@ -23,7 +24,7 @@ public class BordersDAO {
 			ResultSet rs = st.executeQuery();
 
 			while (rs.next()) {
-				System.out.format("%d %s %s\n", rs.getInt("ccode"), rs.getString("StateAbb"), rs.getString("StateNme"));
+				result.add(new Country(rs.getInt("CCode"), rs.getString("StateAbb"), rs.getString("StateNme")));
 			}
 			
 			conn.close();
@@ -36,9 +37,38 @@ public class BordersDAO {
 		}
 	}
 
-	public List<Border> getCountryPairs(int anno) {
+	public List<Border> getCountryPairs(int anno, Map<Integer, Country> stati) {
+		String sql = "SELECT c.state1no, c.state2no,c.dyad, c.year "
+				+ "FROM contiguity c "
+				+ "WHERE c.year<=? AND c.conttype=1 ";
+		List<Border> result= new ArrayList<Border>();
+		
+		try {
+			Connection conn = ConnectDB.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, anno);
+			ResultSet rs = st.executeQuery();
+			
+			
+			while (rs.next()) {
+				int id1= rs.getInt("state1no");
+				Country c1= stati.get(id1);
+				int id2= rs.getInt("state2no");
+				Country c2= stati.get(id2);
+				int dyad= rs.getInt("dyad");
+				Border b= new Border(c1, c2, dyad, rs.getInt("year"),1);
+				result.add(b);
+			}
+			
+			conn.close();
+			return result;
 
-		System.out.println("TODO -- BordersDAO -- getCountryPairs(int anno)");
-		return new ArrayList<Border>();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Errore connessione al database");
+			throw new RuntimeException("Error Connection Database");
+		}
+		
+		
 	}
 }

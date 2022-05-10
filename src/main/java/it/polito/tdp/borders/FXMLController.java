@@ -2,13 +2,16 @@
 package it.polito.tdp.borders;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.borders.model.Country;
 import it.polito.tdp.borders.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ComboBox;
 
 public class FXMLController {
 
@@ -20,6 +23,9 @@ public class FXMLController {
     @FXML // URL location of the FXML file that was given to the FXMLLoader
     private URL location;
 
+    @FXML // fx:id="cmbStati"
+    private ComboBox<Country> cmbStati; // Value injected by FXMLLoader
+
     @FXML // fx:id="txtAnno"
     private TextField txtAnno; // Value injected by FXMLLoader
 
@@ -28,6 +34,24 @@ public class FXMLController {
 
     @FXML
     void doCalcolaConfini(ActionEvent event) {
+    	
+    	String anno= this.txtAnno.getText();
+    	Integer i= Integer.parseInt(anno);
+    	
+    	this.txtResult.setText(this.model.creaGrafo(i));
+    	
+    	
+
+    }
+    @FXML
+    void handleStatiRaggiungibili(ActionEvent event) {
+    	
+    	String anno= this.txtAnno.getText();
+    	Integer i= Integer.parseInt(anno);
+    	Country c= this.cmbStati.getValue();
+    	String str= this.model.visitaGrafo(i, c);
+    	
+    	this.txtResult.setText(str);
 
     }
 
@@ -35,10 +59,13 @@ public class FXMLController {
     void initialize() {
         assert txtAnno != null : "fx:id=\"txtAnno\" was not injected: check your FXML file 'Scene.fxml'.";
         assert txtResult != null : "fx:id=\"txtResult\" was not injected: check your FXML file 'Scene.fxml'.";
+        assert cmbStati != null : "fx:id=\"cmbStati\" was not injected: check your FXML file 'Scene.fxml'.";
+  
 
     }
     
     public void setModel(Model model) {
     	this.model = model;
+        this.cmbStati.getItems().addAll(model.getAllCountry());
     }
 }
