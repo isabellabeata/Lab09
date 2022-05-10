@@ -63,10 +63,7 @@ public class Model {
 		List<Country> list= new LinkedList<>();
 		String s="";
 		
-		while(visita.hasNext()){
-			Country c= visita.next();
-			list.add(c);	
-	}
+		list.addAll(Graphs.neighborListOf(this.grafo, partenza));
 		for(Country c: list) {
 			s+=c.getStateNme()+"\n";
 		}
